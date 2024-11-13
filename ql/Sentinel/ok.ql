@@ -2,33 +2,32 @@
  * @kind path-problem
  */
 
-import java
-import semmle.code.java.dataflow.TaintTracking
-import semmle.code.java.dataflow.FlowSources
-import DataFlow::PathGraph
-
+import java;
+import semmle.code.java.dataflow.TaintTracking;
+import semmle.code.java.dataflow.FlowSources;
+import DataFlow::PathGraph;
 
 /**
- * 把添加machine到定时任务执行连起来
- * 
+ * 将添加机器到定时任务执行链中
+ * 该谓词用于查找 addMachine 和 fetchOnce 之间的调用关系
  */
 predicate machine(DataFlow::Node expSrc, DataFlow::Node expDest) {
-  exists(MethodAccess ma, Method me, MethodAccess ma1,Method me1 |
+  exists(MethodAccess ma, Method me, MethodAccess ma1, Method me1 |
       me.getName() = "addMachine" and
       me = ma.getMethod() and 
       expSrc.asExpr() = ma.getAnArgument() and
-      me1.getName()="fetchOnce" and 
+      me1.getName() = "fetchOnce" and 
       ma1.getMethod() = me1 and 
       ma1.getAnArgument() = expDest.asExpr()
-      )
+  )
 }
 
-
 /**
- * 把添加machine到每个MachineInfo调用自身方法连起来
+ * 将添加机器到每个 MachineInfo 调用自身方法
+ * 该谓词用于查找 addMachine 和 MachineInfo 中 get 方法之间的调用关系
  */
 predicate machine1(DataFlow::Node expSrc, DataFlow::Node expDest) {
-  exists(MethodAccess ma, Method me, MethodAccess ma1,Method me1 |
+  exists(MethodAccess ma, Method me, MethodAccess ma1, Method me1 |
       me.getName() = "addMachine" and
       me = ma.getMethod() and 
       expSrc.asExpr() = ma.getAnArgument() and    
@@ -36,12 +35,15 @@ predicate machine1(DataFlow::Node expSrc, DataFlow::Node expDest) {
       me1.getName().matches("%get%") and
       ma1.getMethod() = me1 and 
       expDest.asExpr() = ma1
-      )
+  )
 }
 
-
+/**
+ * 将机器获取过程连接到 MachineInfo 的 get 方法
+ * 该谓词用于查找 getMachines 和 MachineInfo 中 get 方法之间的调用关系
+ */
 predicate machine2(DataFlow::Node expSrc, DataFlow::Node expDest) {
-  exists(MethodAccess ma, Method me, MethodAccess ma1,Method me1 |
+  exists(MethodAccess ma, Method me, MethodAccess ma1, Method me1 |
       me.getName() = "getMachines" and
       me = ma.getMethod() and 
       expSrc.asExpr() = ma and
@@ -49,60 +51,43 @@ predicate machine2(DataFlow::Node expSrc, DataFlow::Node expDest) {
       me1.getName().matches("%get%") and
       ma1.getMethod() = me1 and 
       expDest.asExpr() = ma1
-      )
+  )
 }
 
-// predicate machine2(DataFlow::Node expSrc, DataFlow::Node expDest) {
-//   exists(MethodAccess ma, Method me |
-//       me.getName() = "addMachine" and
-//       me = ma.getMethod() and 
-//       expSrc.asExpr() = ma.getAnArgument() and
-//       expDest.asExpr() = ma.getAnArgument()
-//       )
-// }
-
-
+/**
+ * SsrfConfig 类继承 TaintTracking::Configuration，用于定义源和汇
+ */
 class SsrfConfig extends TaintTracking::Configuration {
   SsrfConfig() { this = "SsrfConfig" }
 
+  // 定义数据流的源节点
   override predicate isSource(DataFlow::Node src) { 
     src instanceof RemoteFlowSource
   }
 
-
-// override predicate isSink(DataFlow::Node sink) {
-//     exists(Method me, MethodAccess ma| me.getName() = "execute" and ma.getMethod() = me and 
-//     ma.getAnArgument() = sink.asExpr())
-//   }
-
+  // 定义数据流的汇节点
   override predicate isSink(DataFlow::Node sink) {
-    exists(ConstructorCall call,Class clz|
-      call.getAnArgument() = sink.asExpr() and call.getConstructedType()=clz and clz.getName()="HttpGet")
+    exists(ConstructorCall call, Class clz |
+      call.getAnArgument() = sink.asExpr() and 
+      call.getConstructedType() = clz and 
+      clz.getName() = "HttpGet"
+    )
   }
 
-
-  // override predicate isSink(DataFlow::Node sink) {
-  //   exists(Method method, MethodAccess call |
-  //     method.hasName("execute") and method.getDeclaringType().getAnAncestor().hasQualifiedName("org.apache.http.impl.nio.client", "CloseableHttpAsyncClient") and call.getMethod() = method
-  //     and
-  //     sink.asExpr() = call.getArgument(0)
-  //   )
-  // }
-
+  // 定义附加的数据流步骤
   override predicate isAdditionalTaintStep(DataFlow::Node expSrc, DataFlow::Node expDest) {
-    exists(MethodAccess ma, Method me, MethodAccess maa,Method mee |
-     // me.getQualifiedName().matches("%MachineInfo%") and 
-      me.getName()="setIp" and
+    exists(MethodAccess ma, Method me, MethodAccess maa, Method mee |
+      me.getName() = "setIp" and
       ma.getMethod() = me and 
       expSrc.asExpr() = ma.getAnArgument() and
-    //  mee.getQualifiedName().matches("%MachineInfo%") and 
       mee.getName().matches("getIp") and
       maa.getMethod() = mee and 
       expDest.asExpr() = maa 
-      )
-    }
+    )
+  }
 }
 
+// 查找从源到汇的完整路径
 from SsrfConfig config, DataFlow::PathNode source, DataFlow::PathNode sink
 where config.hasFlowPath(source, sink)
 select source.getNode(), source, sink, "source"
