@@ -1,31 +1,5 @@
 # CodeQL 学习记录
 
-## 学习资料
-
-以下是我在学习 CodeQL 过程中参考的一些资料（✅ 表示已阅读完成）：
-
-1. **入门教程**  
-   - ✅ [CodeQL从入门到放弃](https://www.freebuf.com/articles/web/283795.html)  
-   - ✅ [CodeQL 入门指南](https://me.xxf.world/post/codeql-huan-jing-da-jian/)  
-   - ✅ [CodeQL 入门笔记 2](https://mp.weixin.qq.com/s?__biz=Mzg5OTQ3NzA2MQ==&mid=2247485016&idx=1&sn=983c23cd5cff4310ee233b21444815f4)  
-   - ✅ [CodeQL 笔记](https://lfysec.top/2020/06/03/CodeQL%E7%AC%94%E8%AE%B0/)  
-   - ✅ [代码分析引擎 CodeQL 初体验](https://paper.seebug.org/1078)  
-
-2. **进阶学习**  
-   - ✅ [CodeQL 学习笔记](https://zhuanlan.zhihu.com/p/354275826)  
-   - ✅ [CodeQL 数据流分析](https://www.cnblogs.com/goodhacker/p/13583650.html)  
-   - ✅ [CodeQL 与 AST 的关系](https://mp.weixin.qq.com/s?__biz=MzI4Mzc0MTI0Mw==&mid=2247493662&idx=2&sn=8cead6291bb8f3c130093e6006089b5d5)  
-   - ✅ [静态代码检测与漏洞挖掘](https://mp.weixin.qq.com/s?__biz=MzA4NzA5OTYzNw==&mid=2247484233&idx=1&sn=dec528945d54fe94c6492c3b774b5d81)  
-   - ✅ [微服务漏洞挖掘案例](https://mp.weixin.qq.com/s/3rxGuOBsbD9ZZT8fihsyzg)  
-
-3. **实战案例**  
-   - ✅ [如何利用 CodeQL 挖掘 CVE-2020-10199](https://www.anquanke.com/post/id/202987)  
-   - ✅ [CodeQL 挖掘 Log4j 漏洞](https://mp.weixin.qq.com/s/JYco8DysQNszMohH6zJEGw)  
-   - ✅ [CodeQL 数据流复现 Apache Kylin 漏洞](https://xz.aliyun.com/t/8240)  
-
-4. **工具与环境搭建**  
-   - ✅ [编译 OpenJDK8 并生成 CodeQL 数据库](https://blog.csdn.net/mole_exp/article/details/122330521)  
-
 ## 学习心得
 
 1. **基础知识**  
